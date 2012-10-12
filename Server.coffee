@@ -15,13 +15,12 @@ class HP
 	change: (num) -> @mediator.emit "hp", @hp += num, num
 
 class Skill
-	constructor: (@mediator, @worker) ->
-		if !(@mediator instanceof Mediator)
+	constructor: (@mediator, @process) ->
+		if !(@mediator instanceof Mediator) and !(@process instanceof process)
 			throw new Exception("bad contructor")
-		@mediator.on 'hp', => @worker.send({id:cluster.worker.id,player:'Player'+@worker.pid,damage:arguments[1],health:arguments[0]})
+		@mediator.on 'hp', => @process.send({id:cluster.worker.id,player:'Player'+@process.pid,damage:arguments[1],health:arguments[0]})
 
 if cluster.isMaster
-	#do Stuff With Master
 	num = 50
 	while num -= 1
 		worker = cluster.fork()
@@ -40,14 +39,12 @@ if cluster.isMaster
 		worker.on 'disconnect', () ->
 			console.log "Player#{worker.process.pid} logged off crying!"
 else
-	#Do Stuff With Fork
 	process.send "Player#{cluster.worker.process.pid} logs on..."
 	playerMediator = new Mediator()
 	skill = new Skill(playerMediator, process)
 	hp = new HP(playerMediator)
 	setInterval ->
 		hp.change(Math.floor(Math.random()*90-50))
-		#console.log "here"
 	,
 	10
 	#​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
