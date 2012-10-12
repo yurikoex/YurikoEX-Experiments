@@ -36,8 +36,8 @@ if cluster.isMaster
 			else
 				console.log "#{msg}"
 
-		worker.on 'disconnect', () ->
-			console.log "Player#{worker.process.pid} logged off crying!"
+	cluster.on 'disconnect', (worker) ->
+		console.log "Player#{worker.process.pid} logged off crying!"
 else
 	process.send "Player#{cluster.worker.process.pid} logs on..."
 	playerMediator = new Mediator()
